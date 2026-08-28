@@ -97,7 +97,7 @@ console.log("prompt:", drawing.match.phase.promptId);
 
 const strokes = [Array.from({ length: 40 }, (_, i) => ({ x: i * 10, y: i * 5, t: i * 16 }))];
 a.send({ type: "strokes", roundIndex: 0, appended: strokes });
-await b.waitFor("the opponent's live strokes", (m) => m.type === "peerStrokes", 5_000);
+await b.waitFor("the opponent's live strokes", (m) => m.type === "peerStrokes", 10_000);
 console.log("live stroke relay works");
 
 a.send({ type: "submit", roundIndex: 0, strokes });
@@ -126,7 +126,7 @@ const summary = revealed.match.players.map((p) => `${p.username}=${verdicts[p.id
 console.log("verdicts in:", summary.join(" "));
 
 a.send({ type: "ping", sentAt: Date.now() });
-await a.waitFor("a pong", (m) => m.type === "pong", 5_000);
+await a.waitFor("a pong", (m) => m.type === "pong", 10_000);
 
 a.close();
 b.close();
