@@ -31,6 +31,11 @@ describe("parseVerdict", () => {
     expect(result.top3[0]).toEqual({ promptId: "palm-tree", confidence: 0.6 });
   });
 
+  it("keeps free-text sightings readable instead of slugging them into a fake id", () => {
+    const result = parseVerdict({ kind: "rejected", sees: "a simple circle", confidence: 0.5 }, CAT);
+    expect(result.top3[0]?.promptId).toBe("a simple circle");
+  });
+
   it("scores nothing for an unjudged outage rather than guessing", () => {
     const result = parseVerdict({ kind: "unjudged", reason: "timeout" }, CAT);
     expect(result.kind).toBe("unrecognized");

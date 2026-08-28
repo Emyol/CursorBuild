@@ -1,5 +1,5 @@
 import type { Guess, Judge, JudgeRequest, JudgeResult, PromptId } from "@doodle-fight/contract";
-import { slugify } from "@doodle-fight/contract";
+import { isPromptId, slugify } from "@doodle-fight/contract";
 
 /**
  * Talks to the judge service in `model/`. Its wire shape is batch-first:
@@ -120,9 +120,17 @@ export function parseVerdict(raw: unknown, promptId: PromptId): JudgeResult {
   }
 }
 
+/**
+ * `sees` is free text from the model ("a simple circle"), not a prompt id, so it
+ * only becomes one when it actually names a known prompt. Otherwise the phrase
+ * rides through verbatim, because the reveal screen shows it to the player and
+ * "a-simple-circle" reads like a bug.
+ */
 function guessFrom(sees: string | null, confidence: number, fallback: PromptId): Guess[] {
   if (sees === null) return [{ promptId: fallback, confidence: 0 }];
-  return [{ promptId: slugify(sees), confidence }];
+  const slug = slugify(sees);
+  const known = isPromptId(slug) ? slug : (sees as PromptId);
+  return [{ promptId: known, confidence }];
 }
 
 function clamp01(value: unknown): number | null {
