@@ -3,9 +3,14 @@ import PartySocket from "partysocket";
 import type { ClientMsg, RoomCode, ServerMsg, Stroke } from "@doodle-fight/contract";
 import { encode } from "@doodle-fight/contract";
 
+import { partySocketTarget, roomServerUrl } from "./origin.js";
 import type { LocalEvent } from "./store.js";
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? "http://127.0.0.1:8787";
+const SERVER_URL = roomServerUrl(
+  import.meta.env.VITE_SERVER_URL,
+  import.meta.env.DEV,
+  typeof location !== "undefined" ? location.origin : "http://127.0.0.1:8787",
+);
 
 /** Ink is flushed on a fixed tick, not per pointer event, to keep frames cheap. */
 const STROKE_TICK_MS = 50;
@@ -61,10 +66,12 @@ export class RoomClient {
     this.#dispatch = dispatch;
     dispatch({ type: "connecting" });
 
+    const { host, protocol } = partySocketTarget(SERVER_URL);
     this.#socket = new PartySocket({
-      host: SERVER_URL.replace(/^https?:\/\//, ""),
+      host,
       party: "room-server",
       room: code,
+      protocol,
     });
 
     this.#socket.addEventListener("open", () => {

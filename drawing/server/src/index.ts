@@ -30,7 +30,10 @@ export default {
     }
 
     const routed = await routePartykitRequest(request, env);
-    return routed ?? new Response("not found", { status: 404, headers: CORS });
+    if (routed) return routed;
+    // the Vite build lives here so opening the worker URL is the game, not a 404
+    if (env.ASSETS) return env.ASSETS.fetch(request);
+    return new Response("not found", { status: 404, headers: CORS });
   },
 };
 
