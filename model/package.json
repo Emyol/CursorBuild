@@ -1,5 +1,5 @@
 {
-  "name": "doodle-fight-model",
+  "name": "@doodle-fight/model",
   "version": "0.1.0",
   "private": true,
   "description": "The doodle fight judge. Implements the contract Judge port over Gemini.",
@@ -16,6 +16,7 @@
     "eval:report": "tsx eval/report.ts"
   },
   "dependencies": {
+    "@doodle-fight/contract": "workspace:*",
     "@google/genai": "^2.19.0",
     "@napi-rs/canvas": "^1.0.8",
     "zod": "^4.4.3"

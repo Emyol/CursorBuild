@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Reset Editor Layout",
+      "type": "shell",
+      "command": "echo",
+      "args": ["${command:workbench.action.closeAllGroups}"],
+      "presentation": { "reveal": "silent", "panel": "shared", "close": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude 1",
+      "type": "shell",
+      "command": "claude",
+      "presentation": {
+        "panel": "dedicated",
+        "group": "claude",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude 2",
+      "type": "shell",
+      "command": "claude",
+      "presentation": {
+        "panel": "dedicated",
+        "group": "claude",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Open Claude",
+      "dependsOn": ["Claude 1", "Claude 2"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Claude Session",
+      "dependsOn": ["Reset Editor Layout", "Open Claude"],
+      "dependsOrder": "sequence",
+      "runOptions": { "runOn": "folderOpen" },
+      "problemMatcher": []
+    }
+  ]
+}

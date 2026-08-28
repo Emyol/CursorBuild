@@ -1,0 +1,156 @@
+@import url("https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Patrick+Hand&display=swap");
+
+:root {
+  --paper: #fffdf7;
+  --paper-shade: #f4efe2;
+  --ink: #1a1a1a;
+  --ink-soft: #5b574e;
+  --accent: #e8562a;
+  --accent-soft: #ffd9cc;
+  --mint: #2aa17c;
+  --sky: #3b7dd8;
+  --gold: #f2b134;
+
+  --display: "Gloria Hallelujah", "Comic Sans MS", cursive;
+  --hand: "Patrick Hand", "Comic Sans MS", cursive;
+
+  --r-sm: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --r-md: 225px 25px 255px 25px / 25px 255px 25px 225px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--hand);
+  font-size: 18px;
+  color: var(--ink);
+  background-color: var(--paper);
+  /* faint grid, like squared paper */
+  background-image:
+    linear-gradient(rgba(26, 26, 26, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 26, 26, 0.045) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  margin: 0;
+}
+
+/* The jagged border: a hand-drawn rectangle rather than a CSS box. */
+.sketch {
+  position: relative;
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: var(--r-md);
+  box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.16);
+}
+
+.sketch--sm {
+  border-radius: var(--r-sm);
+  border-width: 2px;
+}
+
+.btn {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  padding: 0.7rem 1.5rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: var(--r-sm);
+  box-shadow: 3px 4px 0 var(--ink);
+  cursor: pointer;
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translate(1px, 2px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.btn:active:not(:disabled) {
+  transform: translate(3px, 4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.3);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+.btn--ghost {
+  box-shadow: none;
+  border-style: dashed;
+}
+
+.field {
+  font-family: var(--hand);
+  font-size: 1.15rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 2.5px dashed var(--ink);
+  outline: none;
+}
+
+.field::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.6;
+}
+
+.field:focus {
+  border-bottom-color: var(--accent);
+}
+
+.field--code {
+  font-family: var(--display);
+  font-size: 2rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+:focus-visible {
+  outline: 3px dashed var(--accent);
+  outline-offset: 3px;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.error {
+  color: var(--accent);
+  font-family: var(--hand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

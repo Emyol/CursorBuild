@@ -1,0 +1,401 @@
+.shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem 1.25rem;
+}
+
+/* ---------- landing ---------- */
+
+.landing {
+  width: min(30rem, 100%);
+  padding: 2.25rem 2rem 2rem;
+  text-align: center;
+}
+
+.wordmark {
+  font-size: clamp(2.75rem, 11vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.wordmark span {
+  display: inline-block;
+}
+
+.wordmark .w-doodle {
+  transform: rotate(-3deg);
+}
+
+.wordmark .w-fight {
+  color: var(--accent);
+  transform: rotate(2deg);
+}
+
+.tagline {
+  margin: 0.6rem 0 1.75rem;
+  font-size: 1.05rem;
+}
+
+.landing__actions {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+}
+
+.landing__or {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.25rem 0;
+  color: var(--ink-soft);
+}
+
+.landing__or::before,
+.landing__or::after {
+  content: "";
+  flex: 1;
+  border-top: 2px dashed rgba(26, 26, 26, 0.25);
+}
+
+.join-row {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* ---------- lobby ---------- */
+
+.lobby {
+  width: min(38rem, 100%);
+  padding: 2rem;
+}
+
+.code-plate {
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.code-plate__label {
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.code-plate__value {
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 12vw, 3.5rem);
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: var(--accent);
+}
+
+.roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--r-sm);
+}
+
+.seat--empty {
+  border-style: dashed;
+  opacity: 0.45;
+  justify-content: center;
+}
+
+.seat--gone {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.seat__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  font-size: 0.72rem;
+  padding: 0.1rem 0.45rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--gold);
+}
+
+/* ---------- loading gate ---------- */
+
+.gate {
+  width: min(30rem, 100%);
+  padding: 2rem;
+  text-align: center;
+}
+
+.gate__list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1.5rem 0 1rem;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.gate__row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border: 2px dashed rgba(26, 26, 26, 0.4);
+  border-radius: var(--r-sm);
+}
+
+.gate__row--ready {
+  border-style: solid;
+  border-color: var(--mint);
+  background: rgba(42, 161, 124, 0.09);
+}
+
+.gate__tick {
+  font-family: var(--display);
+  color: var(--mint);
+}
+
+.gate__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2.5px dashed var(--ink-soft);
+  border-radius: 50%;
+  animation: scribble-spin 1.4s linear infinite;
+}
+
+@keyframes scribble-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- match ---------- */
+
+.match {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.85rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.9rem 1.1rem 1.1rem;
+}
+
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1.1rem;
+}
+
+.hud__prompt {
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 3.4vw, 1.6rem);
+}
+
+.hud__prompt em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.timer {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  min-width: 3.5ch;
+  text-align: right;
+}
+
+.timer--urgent {
+  color: var(--accent);
+}
+
+.stage {
+  position: relative;
+  min-height: 0;
+}
+
+.board {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: var(--r-md);
+  border: 2.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 3px 4px 0 rgba(26, 26, 26, 0.16);
+  cursor: crosshair;
+}
+
+/* Opponents live bottom-left so they never crowd the drawing hand. */
+.strip {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: min(60%, 34rem);
+}
+
+.thumb {
+  position: relative;
+  width: 5.25rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.thumb--done {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 2px rgba(42, 161, 124, 0.35);
+}
+
+.thumb--gone {
+  opacity: 0.4;
+}
+
+.thumb canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.thumb__name {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.72rem;
+  border-top: 2px solid var(--ink);
+  background: var(--paper-shade);
+}
+
+.thumb__name b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 253, 247, 0.9);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+
+.countdown__n {
+  font-family: var(--display);
+  font-size: clamp(5rem, 22vw, 11rem);
+  color: var(--accent);
+  animation: pop 900ms ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.5) rotate(-8deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.results {
+  width: min(32rem, 92%);
+  padding: 1.75rem;
+}
+
+.results__list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.results__row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.85rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-sm);
+}
+
+.results__row--hit {
+  background: rgba(42, 161, 124, 0.12);
+  border-color: var(--mint);
+}
+
+.results__row--miss {
+  background: rgba(232, 86, 42, 0.09);
+}
+
+.results__rank {
+  font-family: var(--display);
+  font-size: 1.25rem;
+}
+
+.results__pts {
+  font-family: var(--display);
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.9rem;
+}
+
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.conn__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--mint);
+}
+
+.conn__dot--bad {
+  background: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .strip {
+    max-width: 100%;
+    left: 0.5rem;
+    bottom: 0.5rem;
+  }
+  .thumb {
+    width: 4rem;
+  }
+}
