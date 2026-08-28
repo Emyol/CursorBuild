@@ -42,8 +42,16 @@ const usernameSchema = z
     return cleaned;
   });
 
+/**
+ * Proof that this socket is the same player as before. Without it a client could
+ * reclaim any seat by guessing its id, so the token is required, not optional.
+ */
+const resumeSchema = z.object({ playerId: z.string().uuid(), token: z.string().length(43) }).strict();
+
 export const clientMsgSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("join"), username: usernameSchema }).strip(),
+  z
+    .object({ type: z.literal("join"), username: usernameSchema, resume: resumeSchema.optional() })
+    .strip(),
   z.object({ type: z.literal("ready"), roundIndex }).strip(),
   z.object({ type: z.literal("start") }).strip(),
   z.object({ type: z.literal("strokes"), roundIndex, appended: strokeListSchema }).strip(),
@@ -63,7 +71,7 @@ export type RejectReason =
   | "malformed";
 
 export type ServerMsg =
-  | { type: "joined"; selfId: PlayerId; match: Match }
+  | { type: "joined"; selfId: PlayerId; resumeToken: string; match: Match }
   | { type: "rejected"; reason: RejectReason }
   | { type: "match"; match: Match }
   | { type: "peerStrokes"; playerId: PlayerId; roundIndex: number; appended: Stroke[] }
