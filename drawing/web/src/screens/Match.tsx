@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { Match as MatchState, PlayerId, Stroke } from "@doodle-fight/contract";
-import { DRAWING_MS } from "@doodle-fight/contract";
+import { DRAWING_MS, promptLabel } from "@doodle-fight/contract";
 
 import { DrawingEngine } from "../canvas/engine.js";
 import { OpponentStrip } from "../components/OpponentStrip.js";
@@ -93,13 +93,13 @@ export function Match({
         <div className="hud__prompt">
           {drawing ? (
             <>
-              draw: <em>{phase.promptId}</em>
+              draw: <em>{promptLabel(phase.promptId)}</em>
             </>
           ) : phase.kind === "countdown" ? (
             "get ready"
           ) : phase.kind === "reveal" ? (
             <>
-              it was: <em>{phase.promptId}</em>
+              it was: <em>{promptLabel(phase.promptId)}</em>
             </>
           ) : (
             "final scores"

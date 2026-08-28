@@ -1,4 +1,5 @@
 import type { Player, PlayerId, PromptId, Verdict } from "@doodle-fight/contract";
+import { promptLabel } from "@doodle-fight/contract";
 
 type Props = {
   players: Player[];
@@ -13,7 +14,7 @@ export function Reveal({ players, verdicts, promptId }: Props) {
     <div className="overlay">
       <div className="results sketch">
         <h2>
-          it was a <span style={{ color: "var(--accent)" }}>{promptId}</span>
+          it was <span style={{ color: "var(--accent)" }}>{promptLabel(promptId)}</span>
         </h2>
         <ul className="results__list">
           {ordered.map((player) => {
@@ -48,7 +49,7 @@ function describe(verdict: Verdict | undefined): string {
       return `recognized in ${(verdict.atMs / 1000).toFixed(1)}s`;
     case "rejected": {
       const guess = verdict.top3[0];
-      return guess ? `looked like a ${guess.promptId}` : "not recognized";
+      return guess ? `looked like ${promptLabel(guess.promptId)}` : "not recognized";
     }
     case "timeout":
       return "ran out of time";

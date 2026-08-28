@@ -22,9 +22,11 @@ export type Submission = {
 
 // Bounds on anything inbound. A round is short and a human hand is slow, so a
 // submission past these is a malformed or hostile client, not a prolific artist.
-export const MAX_STROKES_PER_SUBMISSION = 256;
+// kept at or under the judge's own limits, so a submission we accept can never
+// be one the judge rejects as malformed
+export const MAX_STROKES_PER_SUBMISSION = 400;
 export const MAX_POINTS_PER_STROKE = 2048;
-export const MAX_POINTS_PER_SUBMISSION = 16_384;
+export const MAX_POINTS_PER_SUBMISSION = 12_000;
 
 export function quantizeCoord(normalized: number): number {
   if (!Number.isFinite(normalized)) return 0;
