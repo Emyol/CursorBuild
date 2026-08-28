@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  MAX_PLAYERS,
-  MIN_PLAYERS,
   ROOM_CODE_ALPHABET,
   ROOM_CODE_LENGTH,
   USERNAME_MAX_LENGTH,
@@ -11,6 +9,7 @@ import {
   normalizeRoomCodeInput,
   normalizeUsername,
 } from "./ids.js";
+import { MAX_PLAYERS, MIN_PLAYERS } from "./match.js";
 
 describe("room code alphabet", () => {
   it("omits every glyph that is ambiguous when read aloud", () => {

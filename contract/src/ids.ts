@@ -15,9 +15,6 @@ export const ROOM_CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
 export const ROOM_CODE_LENGTH = 4;
 
-export const MIN_PLAYERS = 2;
-export const MAX_PLAYERS = 8;
-
 export const USERNAME_MAX_LENGTH = 16;
 
 /** Returns a uniformly distributed integer in `[0, n)`. */

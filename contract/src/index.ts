@@ -4,4 +4,6 @@ export * from "./judge.js";
 export * from "./match.js";
 export * from "./prompts.js";
 export * from "./protocol.js";
+export * from "./reducer.js";
+export * from "./scoring.js";
 export * from "./strokes.js";

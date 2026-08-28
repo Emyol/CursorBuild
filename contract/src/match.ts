@@ -25,9 +25,23 @@ export type Standing = {
 export type Phase =
   | { kind: "lobby" }
   | { kind: "loading"; roundIndex: number; deadline: number }
+  // the prompt is absent here on purpose, so a client cannot read it early
   | { kind: "countdown"; roundIndex: number; startsAt: number }
-  | { kind: "drawing"; roundIndex: number; promptId: PromptId; endsAt: number }
-  | { kind: "reveal"; roundIndex: number; promptId: PromptId; verdicts: Record<PlayerId, Verdict>; endsAt: number }
+  | {
+      kind: "drawing";
+      roundIndex: number;
+      promptId: PromptId;
+      endsAt: number;
+      submitted: PlayerId[];
+      verdicts: Record<PlayerId, Verdict>;
+    }
+  | {
+      kind: "reveal";
+      roundIndex: number;
+      promptId: PromptId;
+      verdicts: Record<PlayerId, Verdict>;
+      endsAt: number;
+    }
   | { kind: "finished"; standings: Standing[] };
 
 export type PhaseKind = Phase["kind"];
@@ -40,6 +54,9 @@ export type Match = {
   /** One prompt per round, drawn when the match starts. */
   prompts: PromptId[];
 };
+
+export const MIN_PLAYERS = 2;
+export const MAX_PLAYERS = 8;
 
 export const DEFAULT_TOTAL_ROUNDS = 5;
 export const COUNTDOWN_MS = 3_000;
