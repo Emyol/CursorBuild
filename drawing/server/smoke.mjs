@@ -16,14 +16,24 @@ console.log("room code:", code);
 function player(name) {
   const socket = new WebSocket(`${ws}/parties/room-server/${code}`);
   const seen = [];
+  const watchers = new Set();
   const ready = new Promise((resolve) => (socket.onopen = resolve));
+
   socket.onmessage = (e) => {
     const msg = JSON.parse(e.data);
     seen.push(msg);
     if (msg.type === "match" && msg.match.phase.kind === "loading") {
       socket.send(JSON.stringify({ type: "ready", roundIndex: 0 }));
     }
+    // phases are settled the moment they arrive; sampling the latest message
+    // later would miss any window shorter than the sleep before the assertion
+    for (const watcher of [...watchers]) {
+      if (!watcher.test(msg)) continue;
+      watchers.delete(watcher);
+      watcher.settle(msg);
+    }
   };
+
   return {
     seen,
     async join() {
@@ -32,60 +42,91 @@ function player(name) {
     },
     send: (m) => socket.send(JSON.stringify(m)),
     close: () => socket.close(),
+    /** Resolves with the first message matching `test`, past ones included. */
+    waitFor(label, test, timeoutMs) {
+      const already = seen.find(test);
+      if (already) return Promise.resolve(already);
+      return new Promise((resolve) => {
+        const watcher = {
+          test,
+          settle: (msg) => {
+            clearTimeout(timer);
+            resolve(msg);
+          },
+        };
+        const timer = setTimeout(() => {
+          watchers.delete(watcher);
+          fail(`[${name}] timed out after ${timeoutMs}ms waiting for ${label}`);
+        }, timeoutMs);
+        watchers.add(watcher);
+      });
+    },
   };
 }
 
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const isMatch = (m) => m.type === "match";
+const phaseIs = (kind) => (m) => isMatch(m) && m.match.phase.kind === kind;
 
 const a = player("ada");
 const b = player("grace");
 await a.join();
 await b.join();
-await wait(400);
 
-const joinedA = a.seen.find((m) => m.type === "joined");
-if (!joinedA) fail("player a never got a joined message");
+const joinedA = await a.waitFor("a join acknowledgement", (m) => m.type === "joined", 10_000);
+const joinedB = await b.waitFor("a join acknowledgement", (m) => m.type === "joined", 10_000);
 if (!joinedA.resumeToken) fail("no resume token issued");
 
-const roster = a.seen.filter((m) => m.type === "match").pop() ?? joinedA;
+const roster = await a.waitFor("both players on the roster", (m) => isMatch(m) && m.match.players.length === 2, 10_000);
 const names = roster.match.players.map((p) => p.username);
-if (names.length !== 2) fail(`expected 2 players, got ${JSON.stringify(names)}`);
 if (!names.includes("ada") || !names.includes("grace")) fail(`wrong roster: ${names}`);
 console.log("roster:", names.join(", "));
 
-a.send({ type: "start" });
-await wait(500);
-const afterStart = a.seen.filter((m) => m.type === "match").pop();
-const phase = afterStart.match.phase.kind;
-if (phase !== "countdown" && phase !== "drawing") {
-  fail(`handshake did not open the gate, phase is ${phase}`);
-}
-console.log("handshake passed, phase:", phase);
+// join order is a race over a real network and only the host may open the gate
+const seat = roster.match.players.find((p) => p.isHost);
+if (!seat) fail("no host on the roster");
+const host = seat.id === joinedA.selfId ? a : seat.id === joinedB.selfId ? b : fail(`host ${seat.id} is neither player`);
+console.log("host:", seat.username);
 
-await wait(3200);
-const drawing = a.seen.filter((m) => m.type === "match").pop();
-if (drawing.match.phase.kind !== "drawing") fail(`expected drawing, got ${drawing.match.phase.kind}`);
+host.send({ type: "start" });
+const gated = await a.waitFor("the loading gate to open", (m) => phaseIs("countdown")(m) || phaseIs("drawing")(m), 25_000);
+console.log("handshake passed, phase:", gated.match.phase.kind);
+
+const drawing = await a.waitFor("the drawing phase", phaseIs("drawing"), 15_000);
 if (!drawing.match.phase.promptId) fail("no prompt issued");
 console.log("prompt:", drawing.match.phase.promptId);
 
 const strokes = [Array.from({ length: 40 }, (_, i) => ({ x: i * 10, y: i * 5, t: i * 16 }))];
 a.send({ type: "strokes", roundIndex: 0, appended: strokes });
-await wait(150);
-if (!b.seen.some((m) => m.type === "peerStrokes")) fail("opponent never received live strokes");
+await b.waitFor("the opponent's live strokes", (m) => m.type === "peerStrokes", 5_000);
 console.log("live stroke relay works");
 
 a.send({ type: "submit", roundIndex: 0, strokes });
 b.send({ type: "submit", roundIndex: 0, strokes: [[{ x: 1, y: 1, t: 1 }]] });
-await wait(600);
-const revealed = a.seen.filter((m) => m.type === "match").pop();
-if (revealed.match.phase.kind !== "reveal") fail(`expected reveal, got ${revealed.match.phase.kind}`);
-const scores = revealed.match.players.map((p) => `${p.username}=${p.score}`);
-console.log("verdicts in, scores:", scores.join(" "));
-if (revealed.match.players.every((p) => p.score === 0)) fail("nobody scored, judge never ran");
+
+// the stand-in judge answers instantly and a real model call takes seconds, but
+// either way the round is forced closed once the drawing deadline passes
+const revealed = await a.waitFor(
+  "round 0 to reveal",
+  (m) => phaseIs("reveal")(m) && m.match.phase.roundIndex === 0,
+  40_000,
+);
+
+// scribbles from a scripted client deserve to be rejected, so a verdict for
+// every submitter is the real proof the judge ran, not a nonzero score
+const { verdicts } = revealed.match.phase;
+for (const p of revealed.match.players) {
+  if (!verdicts[p.id]) fail(`no verdict for ${p.username}`);
+}
+// the reducer backfills a timeout for anyone the judge never answered for, so
+// an all-timeout reveal means the judge never ran at all
+if (revealed.match.players.every((p) => verdicts[p.id].kind === "timeout")) {
+  fail("every verdict timed out, the judge never answered");
+}
+const summary = revealed.match.players.map((p) => `${p.username}=${verdicts[p.id].kind}/${p.score}`);
+console.log("verdicts in:", summary.join(" "));
 
 a.send({ type: "ping", sentAt: Date.now() });
-await wait(200);
-if (!a.seen.some((m) => m.type === "pong")) fail("no pong");
+await a.waitFor("a pong", (m) => m.type === "pong", 5_000);
 
 a.close();
 b.close();
