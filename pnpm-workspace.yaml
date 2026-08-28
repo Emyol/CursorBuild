@@ -1,0 +1,4 @@
+packages:
+  - contract
+  - drawing/*
+  - model
