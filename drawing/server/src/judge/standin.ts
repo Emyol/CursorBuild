@@ -7,6 +7,10 @@ import { countPoints } from "@doodle-fight/contract";
  * It rewards anyone who actually drew something rather than pretending to see.
  */
 export class StandInJudge implements Judge {
+  async judgeBatch(requests: JudgeRequest[]): Promise<JudgeResult[]> {
+    return Promise.all(requests.map((request) => this.judge(request)));
+  }
+
   async judge(request: JudgeRequest): Promise<JudgeResult> {
     const points = countPoints(request.strokes);
     const enoughInk = request.strokes.length >= 1 && points >= 24;

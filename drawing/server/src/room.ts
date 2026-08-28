@@ -52,10 +52,15 @@ export class RoomServer extends Server<Env> {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    // the stand-in keeps the loop playable until model/ is deployed
-    this.#judge = env.JUDGE_URL
-      ? new RemoteJudge({ url: env.JUDGE_URL })
-      : new StandInJudge();
+    // the judge fails closed without a secret, so both must be present to use it
+    this.#judge =
+      env.JUDGE_URL && env.JUDGE_SHARED_SECRET
+        ? new RemoteJudge({
+            baseUrl: env.JUDGE_URL,
+            sharedSecret: env.JUDGE_SHARED_SECRET,
+            roomCode: ctx.id.name,
+          })
+        : new StandInJudge();
     // hibernation wipes memory but not storage, so every entry point must find state here
     ctx.blockConcurrencyWhile(async () => {
       this.#match = (await ctx.storage.get<Match>(MATCH_KEY)) ?? null;

@@ -17,6 +17,8 @@ playwright-report/
 .env
 .env.*
 !.env.example
+# wrangler's local secret store
+.dev.vars
 
 .DS_Store
 Thumbs.db
