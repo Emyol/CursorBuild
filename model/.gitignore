@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.local
+.vercel/
+
+data/quickdraw/
+data/images/
+results/cache/
+results/*.local.json
+test/__image_snapshots__/*.actual.png
