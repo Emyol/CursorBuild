@@ -23,8 +23,11 @@ import {
   makePlayerId,
 } from "@doodle-fight/contract";
 
+import type { Judge } from "@doodle-fight/contract";
+
 import type { Env } from "./env.js";
 import { admit } from "./admission.js";
+import { RemoteJudge } from "./judge/remote.js";
 import { StandInJudge } from "./judge/standin.js";
 import { TokenBucket } from "./ratelimit.js";
 
@@ -45,10 +48,14 @@ export class RoomServer extends Server<Env> {
   #buckets = new WeakMap<Connection, TokenBucket>();
   /** Strokes for the round in flight. Transient; a round is far shorter than an idle timeout. */
   #strokes = new Map<PlayerId, Stroke[]>();
-  #judge = new StandInJudge();
+  #judge: Judge;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    // the stand-in keeps the loop playable until model/ is deployed
+    this.#judge = env.JUDGE_URL
+      ? new RemoteJudge({ url: env.JUDGE_URL })
+      : new StandInJudge();
     // hibernation wipes memory but not storage, so every entry point must find state here
     ctx.blockConcurrencyWhile(async () => {
       this.#match = (await ctx.storage.get<Match>(MATCH_KEY)) ?? null;
