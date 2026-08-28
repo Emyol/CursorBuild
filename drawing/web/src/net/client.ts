@@ -13,6 +13,28 @@ const PING_INTERVAL_MS = 5_000;
 
 export type Resume = { playerId: string; token: string };
 
+const RESUME_KEY = "doodle-fight:resume";
+
+export function rememberResume(code: string, playerId: string, token: string): void {
+  sessionStorage.setItem(RESUME_KEY, JSON.stringify({ code, playerId, token }));
+}
+
+export function forgetResume(): void {
+  sessionStorage.removeItem(RESUME_KEY);
+}
+
+/** Only returned for the room it was issued in, so a ticket cannot leak sideways. */
+export function readResume(code: RoomCode): Resume | undefined {
+  try {
+    const raw = sessionStorage.getItem(RESUME_KEY);
+    if (!raw) return undefined;
+    const saved = JSON.parse(raw) as { code: string; playerId: string; token: string };
+    return saved.code === code ? { playerId: saved.playerId, token: saved.token } : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function createRoom(): Promise<RoomCode> {
   const res = await fetch(`${SERVER_URL}/api/rooms`, { method: "POST" });
   if (!res.ok) throw new Error("could not create a room");
@@ -50,7 +72,10 @@ export class RoomClient {
       this.#send({ type: "join", username, ...(resume ? { resume } : {}) });
     });
     this.#socket.addEventListener("message", (event) => {
-      dispatch({ type: "server", msg: JSON.parse(event.data as string) as ServerMsg });
+      const msg = JSON.parse(event.data as string) as ServerMsg;
+      // banked immediately so a refresh mid-match can reclaim the same seat
+      if (msg.type === "joined") rememberResume(code, msg.selfId, msg.resumeToken);
+      dispatch({ type: "server", msg });
     });
     this.#socket.addEventListener("close", () => dispatch({ type: "disconnected" }));
 
