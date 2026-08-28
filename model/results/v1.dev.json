@@ -1,0 +1,45 @@
+{
+  "label": "v1",
+  "split": "dev",
+  "model": "gemini-3.1-flash-lite",
+  "promptVersion": "v1",
+  "cases": 16,
+  "falseAcceptRate": 0,
+  "falseRejectRate": 0.16666666666666663,
+  "partial30Recall": 0,
+  "partial60Recall": 1,
+  "unjudged": 1,
+  "latencyP95Ms": 3705,
+  "byKind": {
+    "negative": {
+      "n": 4,
+      "accepted": 0,
+      "unjudged": 0,
+      "acceptRate": 0
+    },
+    "positive": {
+      "n": 6,
+      "accepted": 5,
+      "unjudged": 1,
+      "acceptRate": 0.8333333333333334
+    },
+    "partial-30": {
+      "n": 4,
+      "accepted": 0,
+      "unjudged": 0,
+      "acceptRate": 0
+    },
+    "partial-60": {
+      "n": 1,
+      "accepted": 1,
+      "unjudged": 0,
+      "acceptRate": 1
+    },
+    "hard-negative": {
+      "n": 1,
+      "accepted": 0,
+      "unjudged": 0,
+      "acceptRate": 0
+    }
+  }
+}
